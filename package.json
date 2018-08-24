@@ -1,0 +1,43 @@
+{
+  "name": "jsend-response-builder-express",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "lint": "node node_modules/tslint/bin/tslint --project . -c tslint.yml",
+    "test": "mocha -r ts-node/register tests/**/*.ts --exit",
+    "build": "rimraf dist/dev/* && tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JoeHartzell/jsend-response-builder-express.git"
+  },
+  "keywords": [
+    "typescript",
+    "express",
+    "jsend"
+  ],
+  "author": "Joe Hartzell",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/JoeHartzell/jsend-response-builder-express/issues"
+  },
+  "homepage": "https://github.com/JoeHartzell/jsend-response-builder-express#readme",
+  "devDependencies": {
+    "@types/chai": "^4.1.4",
+    "@types/express": "^4.16.0",
+    "@types/mocha": "^5.2.5",
+    "@types/node": "^10.9.1",
+    "chai": "^4.1.2",
+    "mocha": "^5.2.0",
+    "rimraf": "^2.6.2",
+    "tslint": "^5.11.0"
+  },
+  "dependencies": {
+    "jsend-response-builder": "^2.0.1",
+    "typescript": "^3.0.1"
+  }
+}
