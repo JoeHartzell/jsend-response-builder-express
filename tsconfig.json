@@ -3,8 +3,8 @@
         "module": "commonjs",
         "target": "es6",
         "strict": true,
-        "declaration": true,
         "moduleResolution": "node",
+        "declaration": true,
         "sourceMap": true,
         "outDir": "dist",
         "baseUrl": ".",
@@ -17,5 +17,5 @@
     "include": [
         "lib/**/*.ts",
         "types/**/*"
-    ],
+    ]
 }

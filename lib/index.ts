@@ -1,89 +1,109 @@
-import { NextFunction, Request, Response } from 'express';
+import * as e from 'express';
 import JSendResponseBuilder, { IJSendResponseBuilderOptions } from 'jsend-response-builder';
 
+// this extends the response interface to include the new jsend property
 /* tslint:disable:interface-name */
-// this is to add the jsend property to the express Response object
-declare module 'express' {
-    interface Response {
-        jsend: IJSendMiddleware;
+declare global {
+    namespace Express {
+        interface Response {
+            jsend: JSendMiddleware;
+        }
     }
 }
 /* tslint:enable:interface-name */
 
 /**
- * interface that defines the structure of the JSend middleware
+ * @class JSendMiddleware
+ * @summary middleware for sending jsend formatted responses
  */
-export interface IJSendMiddleware {
-    success: <T>(data: T, code?: number) => void;
-    fail: <T>(data: T, code?: number) => void;
-    error: <T = null>(message: string, code?: number, data?: T) => void;
+class JSendMiddleware {
+    /**
+     * the express response
+     */
+    private response: e.Response;
+
+    /**
+     * the jsend response builder instance
+     */
+    private responseBuilder: JSendResponseBuilder;
+
+    /**
+     * @constructor
+     * @summary creates a new instance of jsend middleware
+     * @param response express response
+     * @param responseBuilder jsend response builder
+     */
+    constructor(response: e.Response, responseBuilder: JSendResponseBuilder) {
+        this.response = response;
+        this.responseBuilder = responseBuilder;
+    }
+
+    /**
+     * @summary sends a jsend success response
+     * @param data data for the success response
+     * @param code response code (optional)
+     */
+    public success<T>(data: T, code?: number): e.Response {
+        this.setStatus(code);
+
+        // send the response
+        return this.response.json(
+            this.responseBuilder.success(data),
+        );
+    }
+
+    /**
+     * @summary sends a jsend fail response
+     * @param data failure description data
+     * @param code response code (optional)
+     */
+    public fail<T>(data: T, code?: number): e.Response {
+        this.setStatus(code);
+
+        // send the response
+        return this.response.json(
+            this.responseBuilder.fail(data),
+        );
+    }
+
+    /**
+     * @summary sends a jsend error response
+     * @param message error message
+     * @param code response code (optional)
+     * @param data additional error data (optional)
+     */
+    public error<T = null>(message: string, code?: number, data?: T): e.Response {
+        this.setStatus(code);
+
+        // send the response
+        return this.response.json(
+            this.responseBuilder.error(message, this.response.statusCode, data),
+        );
+    }
+
+    /**
+     * @summary sets a response status code if it exists
+     * @param res express response
+     * @param code status code
+     */
+    private setStatus(code?: number) {
+        if (code) {
+            this.response.status(code);
+        }
+    }
 }
 
 /**
- * configures the jsend express middleware
+ * @summary configures the jsend express middleware
  * @param options options for configuring the jsend middleware
  */
-export default function jsend(options?: IJSendResponseBuilderOptions) {
+export default function jsend(options?: IJSendResponseBuilderOptions): e.RequestHandler {
     // the JSendResponseBuilder
     const responseBuilder = new JSendResponseBuilder(options);
 
-    return (req: Request, res: Response, next: NextFunction) => {
-        res.jsend = {
-            /**
-             * returns a jsend success response
-             * @param data data for the success response
-             * @param code the response code (defaults to 200)
-             */
-            success: <T>(data: T, code?: number) => {
-                // set the code if it exists
-                if (code) {
-                    res.status(code);
-                }
-
-                // send the response
-                return res
-                    .json(
-                        responseBuilder.success(data),
-                    );
-            },
-
-            /**
-             * sends a jsend fail response
-             * @param data data for the fail response
-             * @param code the response code
-             */
-            fail: <T>(data: T, code?: number) => {
-                // set the code if it exists
-                if (code) {
-                    res.status(code);
-                }
-
-                // send the response
-                return res
-                    .json(
-                        responseBuilder.fail(data),
-                    );
-            },
-
-            /**
-             * sends a jsend error response
-             * @param message error message
-             * @param code the response code
-             * @param data additional information about the error (optional)
-             */
-            error: <T = null>(message: string, code?: number, data?: T) => {
-                // set the code if it exists
-                if (code) {
-                    res.status(code);
-                }
-
-                // send the response
-                return res
-                    .json(
-                        responseBuilder.error(message, res.statusCode, data),
-                    );
-            },
-        };
+    return (req: e.Request, res: e.Response, next: e.NextFunction) => {
+        res.jsend = new JSendMiddleware(res, responseBuilder);
+        return next();
     };
 }
 
