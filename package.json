@@ -1,6 +1,6 @@
 {
   "name": "jsend-response-builder-express",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -38,7 +38,7 @@
     "tslint": "^5.11.0"
   },
   "dependencies": {
-    "jsend-response-builder": "^2.0.4",
+    "jsend-response-builder": "^2.0.5",
     "typescript": "^3.1.3"
   }
 }
